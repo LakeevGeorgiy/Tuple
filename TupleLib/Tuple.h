@@ -22,11 +22,6 @@ public:
         return *this;
     }
 
-
-    friend tuple<Head, Tail...> make_tuple(Head head, Tail... tail);
-
-    template <typename Type, typename...Types>
-    friend Type get(const tuple<Types...>& tuple);
 };
 
 template <typename Head>
@@ -38,7 +33,6 @@ public:
 public:
     tuple() = default;
     tuple(Head&& value): value(value) {}
-    friend tuple<Head> make_tuple(Head head);
 };
 
 template <typename Head, typename ...Tail>
@@ -58,7 +52,14 @@ tuple<Head> make_tuple(Head head){
     return tuple<Head>(head);
 }
 
-template <typename Type, typename...Types>
-Type get(const tuple<Types...>& tuple){
-
+template <typename Type, typename Head, typename...Tail>
+Type get(tuple<Head, Tail...>& tuple) {
+    if constexpr(std::is_same_v<Type, Head>)
+        return tuple.value;
+    if constexpr(sizeof...(Tail) > 0) {
+        auto temp = *tuple.base;
+        return get<Type>(temp);
+    } else{
+        throw std::exception();
+    }
 }
