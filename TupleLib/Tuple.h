@@ -47,11 +47,6 @@ tuple<Head, Tail...> make_tuple(Head head, Tail...tail){
     return temp;
 }
 
-template <typename Head>
-tuple<Head> make_tuple(Head head){
-    return tuple<Head>(head);
-}
-
 template <typename Type, typename Head, typename...Tail>
 Type get(tuple<Head, Tail...>& tuple) {
     if constexpr(std::is_same_v<Type, Head>)
@@ -61,5 +56,15 @@ Type get(tuple<Head, Tail...>& tuple) {
         return get<Type>(temp);
     } else{
         throw std::exception();
+    }
+}
+
+template <size_t index, typename Head, typename ...Tail>
+auto get(tuple<Head, Tail...>& tuple){
+    if constexpr(index == 0) {
+        return tuple.value;
+    } else {
+        auto temp = *tuple.base;
+        return get<index - 1>(temp);
     }
 }
